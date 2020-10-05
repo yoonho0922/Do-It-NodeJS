@@ -5,7 +5,6 @@ fs.open('./output.txt', 'w', function(err, fd){
     if(err) throw err;
     
     console.log('fd : ' + fd);
-    console.dir(fd);
     
     var buf = new Buffer('안녕!\n');
     fs.write(fd,buf, 0, buf.length, null, function(err, written, buffer){
