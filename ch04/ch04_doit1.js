@@ -13,7 +13,8 @@ fs.open('./address.txt', 'r', function(err, fd){
         
         for(var i in rowStr){
             var colStr = rowStr[i].split(' ', 1);
-            console.log('%s',colStr[0]);    
+            console.log('%s',colStr[0]
+                       );    
         }
         
         fs.close(fd, function(){});
