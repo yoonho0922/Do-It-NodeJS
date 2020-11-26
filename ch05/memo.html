@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    	<medta charset="UTF-8"/>
+        <title>메모</title>
+  </head>
+  <body>
+    <h1>메모</h1>
+    <br>
+    <form method="post" action="/process/save">
+      <table>
+        
+        <tr>
+          <td><label>작성자</label></td>
+          <td><input type="text" name="writer"></td>
+        </tr>
+        <tr>
+          <td><label>작성일시</label></td>
+          <td><input type="text" name="date"></td>
+        </tr>
+        <tr>
+          <td><label>내용</label></td>  
+        </tr>
+        <tr>
+          <td><input type="text" name="content"></td>  
+        </tr>
+      </table>
+      <input type="submit" value="저장" name="">
+    </form>
+  </body>
+</html>
