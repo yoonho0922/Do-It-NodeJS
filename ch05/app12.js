@@ -27,7 +27,6 @@ app.use(bodyParser.json());
 app.use('/public', static(path.join(__dirname, 'public')));
 
 
-app.use(cookieParser());
 app.use(expressSession({
     secret:'my key',
     resave:true,
@@ -80,9 +79,12 @@ router.route('/process/logout').get(function(req,res){
     if(req.session.user){
         // 로그인 된 상태
         console.log('로그아웃합니다.');
+
+        delete req.session.user.delete;
+
         req.session.destroy(function(err){
             if(err) {throw err;}
-            
+
             console.log('세션을 삭제하고 로그아웃되었습니다.');
             res.redirect('/public/login2.html');
         });
