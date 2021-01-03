@@ -33,7 +33,7 @@ router.route('/process/login').post(function(req, res){
     res.write('<h1>Express 서버에서 응답한 결과입니다.</h1>');
     res.write('<div><p>paramId : ' + paramId + '</p></div>');
     res.write('<div><p>Param password : ' + paramPassword + '</p></div>');
-    res.write("<br><br><a href='/public/login2.html'>로그인 페이지로 돌아가기</a>");
+    res.write("<br><br><a href='/ch06/public/login2.html'>로그인 페이지로 돌아가기</a>");
     res.end();
     
 });

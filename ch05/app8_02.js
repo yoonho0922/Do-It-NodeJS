@@ -36,7 +36,7 @@ router.route('/process/login/:name').post(function(req, res){
     res.write('<div><p>param name : ' + paramName + '</p></div>');
     res.write('<div><p>paramId : ' + paramId + '</p></div>');
     res.write('<div><p>Param password : ' + paramPassword + '</p></div>');
-    res.write("<br><br><a href='/public/login2.html'>로그인 페이지로 돌아가기</a>");
+    res.write("<br><br><a href='/ch06/public/login2.html'>로그인 페이지로 돌아가기</a>");
     res.end();
     
 });
