@@ -60,11 +60,10 @@ http.createServer(app).listen(app.get('port'), function(){
 });
 
 // 데이터베이스
-var MongoClient = require('mongodb').MongoClient;
 var mongoose = require('mongoose');
 
 var database;
-var UserSchema; // 데이터베이스 ㅅ객체를 위한 변수 선언
+var UserSchema; // 데이터베이스 객체를 위한 변수 선언
 var UserModel; // 데이터베이스 모델 객체를 위한 변수 선언
 
 function connectDB(){
@@ -81,13 +80,24 @@ function connectDB(){
         console.log('데이터베이스에 연결되었습니다. : ' + databaseUrl);
         //스키마 정의
         UserSchema = mongoose.Schema({
-            id: String,
-            name: String,
-            password: String
+            id: {type: String, required: true, unique: true},
+            password: {type: String, required: true},
+            name: {type: String, index: 'hashed'},
+            age: {type: Number, 'default': -1},
+            created_at: {type: Date, index: {unique: false}, 'default' : Date.now},
+            updated_at: {type: Date, index: {unique: false}, 'default' : Date.now},
         });
+        // 스키마에 static 메소드 추가
+        UserSchema.static('findById', function(id, callback){
+            return this.find({id: id}, callback);
+        });
+
+        UserSchema.static('findAll', function(callback){
+            return this.find({ }, callback);
+        })
         console.log('UserSchema 정의함');
         //UserModel 모델 정의
-        UserModel = mongoose.model('users', UserSchema);
+        UserModel = mongoose.model('users2', UserSchema);
         console.log('UserModel 정의함');
     });
     // 연결 끊어졌을 때 5초 후 재연결
@@ -95,7 +105,7 @@ function connectDB(){
         console.log('연결이 끊어졌습니다. 5초 후 다시 연결합니다.');
         setInterval(connectDB, 5000);
     });
-};
+}
 
 // process/login 라우팅
 router.route('/process/login').post(function(req, res){
@@ -161,6 +171,53 @@ router.route('/process/adduser').post(function(req, res){
     }
 });
 
+// process/listuser 라우팅
+router.route('/process/listuser').post(function(req, res){
+    console.log('/process/listuser 호출됨');
+
+    // 데이터베이스 객체가 초기화된 경우, 모델 객체의 findAll 메소드 호출
+    if(database){
+        // 1. 모든 사용자 검색
+        UserModel.findAll(function(err, results){
+            if(err){
+                console.err('사용자 리스트 조회 중 오류 발생 : ' + err.stack);
+
+                res.writeHead('200', {'Content-Type':'text/html;charset=utf8'});
+                res.write('<h2>사용자 리스트 조회 중 오류 발생</h2>');
+                res.write('<p>' + err.stack + '</p>');
+                res.end();
+                
+                return;
+            }
+            
+            if(results){ //결과 객체가 있으면 리스트 전송
+                console.dir(results);
+
+                res.writeHead('200', {'Content-Type':'text/html;charset=utf8'});
+                res.write('<h2>사용자 리스트</h2>');
+                res.write('<div><ul>');
+                
+                for(var i = 0; i < results.length; i++){
+                    var curId = results[i].id;
+                    var curName = results[i].name;
+                    res.write('    <li>#' + i + ' : ' + curId + ', ' + curName + '</li>');
+                }
+                
+                res.write('</ul></div>');
+                res.end();
+            } else{ //결과 객체가 없으면 실패 응답 전송
+                res.writeHead('200', {'Content-Type':'text/html;charset=utf8'});
+                res.write('<h2>사용자 리스트 조회 실패</h2>');
+                res.end();
+            }
+        });
+    } else { // 데이터베이스 객체가 초기화되지 않았을 때 실패 응답 전송
+        res.writeHead('200', {'Content-Type':'text/html;charset=utf8'});
+        res.write('<h2>데이터베이스 연결 실패</h2>');
+        res.end();
+    }
+});
+
 // 사용자를 추가하는 함수
 var addUser = function(database, id, password, name, callback){
     console.log('addUser 호출됨 : ' + id + ', ' + password + ', ' + name);
@@ -180,21 +237,32 @@ var addUser = function(database, id, password, name, callback){
 // 사용자를 인증하는 함수
 var authUser = function(database, id, password, callback){
     console.log('authUser 호출됨. : ' + id + ', ' + password);
-    // users 컬렉션 참조
-    var users = database.collection('users');
-    UserModel.find({'id': id, 'password': password}, function(err, result){
-            if(err){
-                callback(err, null);
-                return;
-            }
+    // 1. 아이디를 사용해 검색
+    UserModel.findById(id, function(err, results){
+        if(err){
+            callback(err, null);
+            return;
+        }
 
-            console.log('아이디 [%s], 비밀번호 [%s]로 사용자 검색 결과', id, password);
-            if(results.length>0){
-                console.log('일치하는 사용자 찾음.', id, password);
+        console.log('아이디 [%s]로 사용자 검색 결과', id);
+        console.dir(results);
+
+        if(results.length>0) {
+            console.log('아이디와 일치하는 사용자 찾음.');
+
+            //2. 비밀번호 확인
+            if(results[0].password == password){
+                console.log('비밀번호 일치함');
                 callback(null, results);
-            }else {
-                console.log('일치하는 사용자 찾지 못함.');
+            } else{
+                console.log('비밀번호 일치하지 않음');
                 callback(null, null);
             }
-        });
+
+        } else{
+            console.log('아이디와 일치하는 사용자를 찾지 못함.');
+            callback(null, null);
+        }
+
+    });
 };
