@@ -47,18 +47,6 @@ var database;
 var UserSchema; // 데이터베이스 객체를 위한 변수 선언
 var UserModel; // 데이터베이스 모델 객체를 위한 변수 선언
 
-// user 스키마 및 모델 객체 생성
-function createUserSchema(){
-
-    // user_schema.js 모듈 불러오기
-    UserSchema = require('./database/user_schema').createSchema(mongoose);
-
-    // UserModel 모델 정의
-    UserModel = mongoose.model('users3', UserSchema);
-    console.log('UserModel 정의함.');
-
-}
-
 // 데이터베이스 연결
 function connectDB(){
     // 데이터베이스 연결 정보
@@ -84,6 +72,18 @@ function connectDB(){
         console.log('연결이 끊어졌습니다. 5초 후 다시 연결합니다.');
         setInterval(connectDB, 5000);
     });
+}
+
+// user 스키마 및 모델 객체 생성
+function createUserSchema(){
+
+    // user_schema.js 모듈 불러오기
+    UserSchema = require('./database/user_schema').createSchema(mongoose);
+
+    // UserModel 모델 정의
+    UserModel = mongoose.model('users3', UserSchema);
+    console.log('UserModel 정의함.');
+
 }
 
 // 라우팅
