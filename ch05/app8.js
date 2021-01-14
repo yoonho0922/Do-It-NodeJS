@@ -19,8 +19,7 @@ app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 
 app.use('/public', static(path.join(__dirname, 'public')));
-// 라우터 객체 참조
-var router = express.Router();
++
 
 //라우팅 함수 등록
 router.route('/process/login').post(function(req, res){

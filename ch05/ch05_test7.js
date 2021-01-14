@@ -12,6 +12,7 @@ var req = http.get(options, function(res){
     
     res.on('data', function(chunk){
         resData += chunk;
+
     });
     
     res.on('end', function(){

@@ -6,11 +6,11 @@ app.use(function(req, res, next){
     console.log('첫 번째 미들웨어에서 요청을 처리함');
     
     req.user = 'mike';
-    
-    next();
+
+    next()
 });
 
-app.use('/', function(req, res, next){
+app.use(function(req, res){
     console.log('두 번째 미들웨어에서 요청을 처리함');
     
     res.writeHead('200', {'Content-Type':'text/html;charset=utf8'});

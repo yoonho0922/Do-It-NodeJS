@@ -22,6 +22,7 @@ app.use('/public', static(path.join(__dirname, 'public')));
 
 // 미들웨어에서 파라미터 확인
 
+
 app.use(function(req, res, next){
     console.log('첫 번째 미들웨어에서 요청을 처리함');
     
