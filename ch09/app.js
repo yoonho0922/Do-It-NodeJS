@@ -1,3 +1,13 @@
+/*
+1. 모듈 불러오기
+2. 익스프레스 객체 생성 및 기본 설정
+3. 뷰 엔진 설정
+4. 라우팅 설정
+5. 에러 컨트롤
+6. 서버 실행
+ */
+
+//==== 1. 모듈 불러오기 ====//
 // Express 기본 모듈
 var express = require('express')
     , http = require('http')
@@ -7,16 +17,9 @@ var express = require('express')
 var bodyParser = require('body-parser')
     , cookieParser = require('body-parser')
     , static = require('serve-static')
-    , errorHandler = require('errorhandler')
+    , expressErrorHandler = require('express-error-handler')
+    , expressSession = require('express-session');
 
-// 에러 핸들러 모듈
-var expressErrorHandler = require('express-error-handler');
-
-// Session 미들웨어
-var expressSession = require('express-session');
-
-
-//==== 설정 모듈 관련 ====//
 // 설정 모듈
 var config = require('./config');
 // 데이터베이스 모듈
@@ -24,37 +27,30 @@ var database  = require('./database/database');
 // 라우팅 모듈
 var route_loader = require('./routes/route_loader');
 
-
-// 익스프레스 객체 생성
+//==== 2. 익스프레스 객체 생성 및 기본 설정 ====//
 var app = express();
 
-//===== 뷰 엔진 설정 =====//
-app.set('views', __dirname + '/views');
-app.set('view engine', 'ejs');
-console.log('뷰 엔진이 ejs로 설정되었습니다.');
-
-//===== 서버 변수 설정 및 static으로 public 폴더 설정  =====//
-console.log('config.server_port : %d', config.server_port);
 app.set('port', process.env.PORT || 3000);
-// body-parser를 이용해 application/x-www-form-urlencoded 파싱
-app.use(bodyParser.urlencoded({ extended: false }))
-// body-parser를 이용해 application/json 파싱
-app.use(bodyParser.json());
-// public 폴더를 static으로 오픈
+console.log('config.server_port : %d', config.server_port);
 app.use('/public', static(path.join(__dirname, 'public')));
-// cookie-parser 설정
+app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.json());
 app.use(cookieParser());
-// 세션 설정
 app.use(expressSession({
     secret:'my key',
     resave:true,
     saveUninitialized:true
 }));
 
-// 라우팅 설정
+//===== 3. 뷰 엔진 설정 =====//
+app.set('views', __dirname + '/views');
+app.set('view engine', 'ejs');
+console.log('뷰 엔진이 ejs로 설정되었습니다.');
+
+//==== 4. 라우팅 설정 ====//
 route_loader.init(app, express.Router());
 
-// 404 에러 페이지 처리
+//==== 5. 에러 컨트롤 ====//
 var errorHandler = expressErrorHandler({
     static: {
         '404' : './public/404.html'
@@ -67,7 +63,7 @@ app.all('*', function(req, res){
 app.use(expressErrorHandler.httpError(404));
 app.use(errorHandler);
 
-//==== 서버시작 ====//
+//==== 6. 서버 실행 ====//
 http.createServer(app).listen(app.get('port'), function(){
     console.log('서버가 시작되었습니다. 포트 : ', app.get('port'));
 
