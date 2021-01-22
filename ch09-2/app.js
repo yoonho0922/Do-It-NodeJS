@@ -56,26 +56,8 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());
 
-//==== 패스포트 스트래티지 설정 ====//
-// 패스포트 설정
 var configPssport = require('./config/passport');
 configPssport(app, passport);
-
-// 사용자 인증에 성공했을 때 호출
-passport.serializeUser(function(user, done){
-    console.log('serializeUser() 호출됨.');
-    console.dir(user);
-
-    done(null, user);
-});
-
-// 사용자 인증 이후 사용자 요청이 있을 때 마다 호출
-passport.deserializeUser(function(user, done){
-    console.log('deserializeUser() 호출됨.');
-    console.dir(user);
-
-    done(null, user);
-});
 
 //==== 라우팅 설정 ====//
 var router = express.Router()
