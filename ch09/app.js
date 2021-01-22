@@ -118,7 +118,6 @@ var local_signup = new LocalStrategy({
                 user.save(function(err){
                     if(err) { throw err;}
                     console.log("사용자 데이터 추가함");
-                    return done(null, user);
                 });
             }
         });
@@ -134,7 +133,7 @@ passport.use('local-signup', local_signup);
 // 사용자 인증에 성공했을 때 호출
 passport.serializeUser(function(user, done){
     console.log('serializeUser() 호출됨.');
-    console.dir(user);
+    console.dir(user.email);
 
     done(null, user);
 });
@@ -142,7 +141,7 @@ passport.serializeUser(function(user, done){
 // 사용자 인증 이후 사용자 요청이 있을 때 마다 호출
 passport.deserializeUser(function(user, done){
     console.log('deserializeUser() 호출됨.');
-    console.dir(user);
+    console.dir(user.email);
 
     done(null, user);
 });
